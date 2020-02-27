@@ -21,7 +21,87 @@ player = Player("Name", world.startingRoom)
 
 
 # FILL THIS IN
-traversalPath = ['n', 's']
+
+
+# keep track of path
+traversalPath = []
+# keep track of visited rooms
+visited = {}
+
+
+def go(direction):
+    # travel to room in this direction
+    player.travel(direction)    
+    print(f"Go: {direction}")
+
+
+def find_path(came_from_direction=None): # initialize came_from_direction as None since this is the starting room
+
+    print("\nTraveled from:", came_from_direction)
+    
+    # get player's current room
+    current_room = player.currentRoom.id
+    print("current room:", current_room)
+    # get current room's coordinates
+    coordinates = player.currentRoom.getCoords()
+
+    # if current room has been visited...
+    if current_room in visited:
+        print(f"Room {current_room} has been visited")
+        return
+    # if current room has NOT been visited...
+    else:
+        # then add current room to visited
+        visited[current_room] = coordinates
+        print(f"Added room {current_room} to visited")
+
+    # get all possible exits for current room
+    possible_room_exits = player.currentRoom.getExits()
+    
+    # loop through all the possible exits for current room...
+    for room_exit in possible_room_exits:
+        # if "n" is an option and player did not come from "n"...
+        if room_exit is 'n' and came_from_direction is not room_exit:
+            go('n') # travel "n"
+            traversalPath.append('n') # add traveled direction to path
+            # print("RECURSION")
+            find_path('s') # recursion - check next room with updated came_from_direction
+            go('s') # for when recursion hits a deadend, player travels back the way it came in the room
+            traversalPath.append('s') # add travel direction to path
+
+        if room_exit is 's' and came_from_direction is not room_exit:
+            go('s')
+            traversalPath.append('s')
+            # print("RECURSION")
+            find_path('n')
+            go('n')
+            traversalPath.append('n')
+
+        if room_exit is 'e' and came_from_direction is not room_exit:
+            go('e')
+            traversalPath.append('e')
+            # print("RECURSION")
+            find_path('w')
+            go('w')
+            traversalPath.append('w')
+
+        if room_exit is 'w' and came_from_direction is not room_exit:
+            go('w')
+            traversalPath.append('w')
+            # print("RECURSION")
+            find_path('e')
+            go('e')
+            traversalPath.append('e')
+
+    # print(f"No unvisited rooms connected to room {current_room}. Head back until you find one")
+    
+
+find_path()
+print(f"\nTraversal Path: {traversalPath}\n")
+
+
+
+
 
 
 # TRAVERSAL TEST
